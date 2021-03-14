@@ -12,22 +12,25 @@ object CmdHandler {
 
     private const val START_TAG = "!"
 
-    private val handlers: Map<String, KFunction1<MessageCreateEvent, Unit>> = mapOf(
-            "ping" to ::ping,
-            "help" to ::help,
-            "join" to ::join,
-            "quit" to ::quit
+    private val handlers: Map<List<String>, KFunction1<MessageCreateEvent, Unit>> = mapOf(
+            listOf("ping") to ::ping,
+            listOf("help", "?") to ::help,
+            listOf("join") to ::join,
+            listOf("quit", "leave") to ::quit,
+            listOf("play", "p") to ::play
     )
 
     fun checkCmd(event: MessageCreateEvent) {
         val msg = event.message.content
-        val handler = handlers.entries.find { msg.startsWith(START_TAG + it.key) }
+        val handler = handlers.entries.find {
+            it.key.any { alias -> msg.startsWith(START_TAG + alias) }
+        }
 
         handler?.value?.invoke(event)
     }
 
     private fun ping(event: MessageCreateEvent) {
-        event.message.channel.block()?.createMessage("Pong")
+        event.message.channel.block()?.createMessage("Pong")?.block()
     }
 
     private fun help(event: MessageCreateEvent) {
@@ -53,5 +56,9 @@ object CmdHandler {
 
     private fun quit(event: MessageCreateEvent) {
         VoiceChannelController.leave()
+    }
+
+    private fun play(event: MessageCreateEvent) {
+        TODO()
     }
 }
