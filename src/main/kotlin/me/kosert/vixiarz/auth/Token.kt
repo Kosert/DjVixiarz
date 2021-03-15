@@ -2,6 +2,7 @@ package me.kosert.vixiarz.auth
 
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
+import me.kosert.vixiarz.LOG
 import java.io.File
 
 private const val SECRET_FILENAME = "secret.json"
@@ -19,7 +20,7 @@ object Token {
         val json = File(SECRET_FILENAME).readText()
         val gson = Gson()
         token = gson.fromJson(json, SecretJson::class.java).token
-        println("Token loaded")
+        LOG.info("Token loaded")
     }
 
     fun get() = token
