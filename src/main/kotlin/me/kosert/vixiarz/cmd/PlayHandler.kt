@@ -1,11 +1,13 @@
 package me.kosert.vixiarz.cmd
 
+import discord4j.core.`object`.entity.channel.MessageChannel
 import discord4j.core.event.domain.message.MessageCreateEvent
+import discord4j.rest.util.Color
+import me.kosert.vixiarz.Const
 import me.kosert.vixiarz.Const.ERROR_TITLE
 import me.kosert.vixiarz.channel
-import me.kosert.vixiarz.orNull
+import me.kosert.vixiarz.searcher.MusicSearcher
 import me.kosert.vixiarz.voiceController
-import java.util.function.Consumer
 
 object PlayHandler : IHandler {
 
@@ -13,10 +15,7 @@ object PlayHandler : IHandler {
         val tokens = event.message.content.split(" ").filter { it.isNotBlank() }
 
         if (tokens.size < 2) {
-            event.channel()?.createEmbed {
-                it.setTitle(ERROR_TITLE)
-                it.setDescription("Nie dałeś URL gościu")
-            }?.block()
+            event.channel()?.sendError("Nie dałeś nutki gościu")
             return true
         }
 
@@ -26,10 +25,34 @@ object PlayHandler : IHandler {
                 return false
         }
 
-        val url = tokens[1]
+        val url = if (tokens[1].startsWith("http"))
+            tokens[1]
+        else {
+            val query = tokens.drop(1).joinToString(" ")
+            event.channel()?.createMessage("Szukam nutki: `$query`")?.block()
+
+            val searched = MusicSearcher.search(query) ?: run {
+                event.channel()?.sendError("Nic nie znalazłem :/")
+                return true
+            }
+
+            event.channel()?.createMessage("Znalazłem: `${searched.title}`")?.block()
+            searched.url
+        }
+
+
         val adder = event.member.get()
         val embedCreator = event.voiceController()?.play(adder, url)
         event.channel()?.createEmbed { embedCreator?.create(it) }?.block()
         return true
+    }
+
+    private fun MessageChannel.sendError(text: String) {
+        createEmbed {
+            it.setTitle(ERROR_TITLE)
+            it.setDescription(text)
+            it.setColor(Color.PINK)
+            it.setFooter(Const.FOOTER_TEXT, null)
+        }?.block()
     }
 }

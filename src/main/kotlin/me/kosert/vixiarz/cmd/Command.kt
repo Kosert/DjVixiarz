@@ -16,7 +16,7 @@ enum class Command(
     SKIP(listOf("skip"), "Skipuje pioseneczke", RequireDjHandler, SkipHandler),
 
     QUEUE(listOf("queue", "q"), "Wyświetla kłełe", QueueHandler),
-    NOW(listOf("now", "np"), "Wyświetla co leci", NowPlayingHandler),
+    NOW(listOf("coleci", "np", "now"), "Wyświetla co leci", NowPlayingHandler),
 
     PAUSE(listOf("pause", "stop"), "Pauza", PauseHandler),
     RESUME(listOf("resume"), "Wznawia", ResumeHandler),
