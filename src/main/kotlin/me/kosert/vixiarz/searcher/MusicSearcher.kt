@@ -1,10 +1,9 @@
 package me.kosert.vixiarz.searcher
 
 import com.google.gson.Gson
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import me.kosert.vixiarz.LOG
+import me.sargunvohra.lib.ktunits.seconds
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
@@ -21,8 +20,10 @@ object MusicSearcher {
         if (json.isNullOrBlank())
             return null
 
-        val gson = Gson()
-        return gson.fromJson(json, SearchResponseModel::class.java)?.model
+        return runCatching {
+            val gson = Gson()
+            return gson.fromJson(json, SearchResponseModel::class.java)?.model
+        }.getOrNull()
     }
 
     private suspend fun fetchJson(query: String): String? {
@@ -32,7 +33,9 @@ object MusicSearcher {
         val cmd = "$CMD $SUBPROJECT_ENTRY $query"
 
         return withContext(Dispatchers.IO) {
-            exec(cmd, dir)
+            withTimeoutOrNull(10.seconds.toMilliseconds) {
+                exec(cmd, dir)
+            }
         }
     }
 
