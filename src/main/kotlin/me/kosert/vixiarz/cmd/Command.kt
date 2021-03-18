@@ -21,6 +21,7 @@ enum class Command(
     PAUSE(listOf("pause", "stop"), PauseHandler, help = "Pauza"),
     RESUME(listOf("resume"), ResumeHandler, help = "Wznawia"),
 
-    URBAN_JUNGLE(listOf("miejskadżungla", "miejskadzungla", "dzungla"), JungleHandler)
+    URBAN_JUNGLE(listOf("miejskadżungla", "miejskadzungla", "dzungla"), JungleHandler),
+    POPE(listOf("rarepope", "pope", "jp2"), PopeHandler)
 
 }
