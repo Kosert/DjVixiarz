@@ -14,8 +14,10 @@ object HelpHandler : IHandler {
                 setAuthor("DJ VIXIARZ", null, event.client.self.block()?.avatarUrl)
                 setColor(Color.PINK)
                 setDescription("Help:")
-                Command.values().forEach {
-                    addField(START_TAG + it.aliases.first(), it.help, true)
+                Command.values().forEach { cmd ->
+                    cmd.help?.let {
+                        addField(START_TAG + cmd.aliases.first(), it, true)
+                    }
                 }
                 setFooter(FOOTER_TEXT, null)
             }

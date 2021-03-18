@@ -11,9 +11,9 @@ import java.nio.file.Paths
 
 object MusicSearcher {
 
-    private val CMD = "node"
-    private val SUBPROJECT_FOLDER = "youtubeSearcher"
-    private val SUBPROJECT_ENTRY = "index.js"
+    private const val CMD = "node"
+    private const val SUBPROJECT_FOLDER = "youtubeSearcher"
+    private const val SUBPROJECT_ENTRY = "index.js"
 
     suspend fun search(query: String): SearchedVideo? {
         val json = fetchJson(query)
