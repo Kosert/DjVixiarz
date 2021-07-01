@@ -1,15 +1,13 @@
 package me.kosert.vixiarz
 
-import discord4j.core.spec.EmbedCreateSpec
-import discord4j.rest.util.Color
-import me.kosert.vixiarz.Const.FOOTER_TEXT
+import net.dv8tion.jda.api.EmbedBuilder
+import net.dv8tion.jda.api.entities.MessageEmbed
+import java.awt.Color
 
-class EmbedCreator(
-    private val creator: (EmbedCreateSpec) -> Unit
-) {
-    fun create(embedCreateSpec: EmbedCreateSpec) {
-        embedCreateSpec.setColor(Color.PINK)
-        embedCreateSpec.setFooter(FOOTER_TEXT, null)
-        creator.invoke(embedCreateSpec)
-    }
+fun createEmbed(creator: EmbedBuilder.() -> Unit): MessageEmbed {
+    return EmbedBuilder().apply {
+        setColor(Color.PINK)
+        setFooter(Const.FOOTER_TEXT, null)
+        creator()
+    }.build()
 }

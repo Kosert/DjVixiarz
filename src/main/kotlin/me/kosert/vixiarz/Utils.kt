@@ -1,18 +1,28 @@
 package me.kosert.vixiarz
 
-import discord4j.core.`object`.entity.channel.MessageChannel
-import discord4j.core.event.domain.message.MessageCreateEvent
-import me.kosert.vixiarz.audio.VoiceChannelController
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import me.kosert.vixiarz.audio.GuildVoiceManager
+import me.kosert.vixiarz.audio.VoiceChannelController
 import me.sargunvohra.lib.ktunits.milliseconds
+import net.dv8tion.jda.api.entities.MessageChannel
+import net.dv8tion.jda.api.entities.MessageEmbed
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent
+import java.awt.Color
 import java.util.*
 
-fun MessageCreateEvent.voiceController(): VoiceChannelController? {
-    return guildId.orNull()?.let { GuildVoiceManager.getVoice(it) }
+fun MessageReceivedEvent.voiceController(): VoiceChannelController {
+    return this.guild.id.let { GuildVoiceManager.getVoice(it) }
 }
 
-fun MessageCreateEvent.channel(): MessageChannel? {
-    return message.channel.block()
+suspend fun MessageChannel.sendError(text: String) = withContext(Dispatchers.IO) {
+    val embed = createEmbed {
+        setTitle(Const.ERROR_TITLE)
+        setDescription(text)
+        setColor(Color.PINK)
+        setFooter(Const.FOOTER_TEXT, null)
+    }
+    sendMessage(embed).complete()
 }
 
 fun <T> Optional<T>.orNull(): T? = orElse(null)
@@ -24,3 +34,5 @@ fun Long.formatAsDuration(): String {
     val secondsString = if (seconds < 10) "0$seconds" else seconds
     return "$minutes:$secondsString"
 }
+
+fun MessageEmbed.send(channel: MessageChannel) = channel.sendMessage(this).complete()

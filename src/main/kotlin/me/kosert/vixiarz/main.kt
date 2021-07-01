@@ -1,14 +1,20 @@
 package me.kosert.vixiarz
 
-import discord4j.core.DiscordClientBuilder
-import discord4j.core.event.domain.VoiceStateUpdateEvent
-import discord4j.core.event.domain.lifecycle.ReadyEvent
-import discord4j.core.event.domain.message.MessageCreateEvent
-import kotlinx.coroutines.reactor.mono
+import club.minnced.jda.reactor.ReactiveEventManager
+import club.minnced.jda.reactor.on
+import kotlinx.coroutines.*
+import kotlinx.coroutines.reactive.collect
 import me.kosert.vixiarz.Const.START_TAG
+import me.kosert.vixiarz.audio.GuildVoiceManager
 import me.kosert.vixiarz.auth.Token
 import me.kosert.vixiarz.cmd.Command
-import me.kosert.vixiarz.audio.GuildVoiceManager
+import net.dv8tion.jda.api.JDABuilder
+import net.dv8tion.jda.api.entities.Activity
+import net.dv8tion.jda.api.events.ReadyEvent
+import net.dv8tion.jda.api.events.channel.voice.GenericVoiceChannelEvent
+import net.dv8tion.jda.api.events.channel.voice.update.GenericVoiceChannelUpdateEvent
+import net.dv8tion.jda.api.events.guild.voice.GenericGuildVoiceUpdateEvent
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import reactor.util.Logger
 import reactor.util.Loggers
 import java.util.*
@@ -17,39 +23,44 @@ val LOG: Logger = Loggers.getLogger("VixaLogger")
 
 suspend fun main() {
     LOG.info("Starting")
-    Token.loadFromFile()
-    val client = DiscordClientBuilder.create(Token.get())
-            .build()
-            .login()
-            .block()!!
 
-    client.eventDispatcher.on(ReadyEvent::class.java)
-            .subscribe { event: ReadyEvent ->
-                val self = event.self
-                LOG.info("Logged in as ${self.username}#${self.discriminator}")
-            }
+    val manager = ReactiveEventManager()
 
-    client.eventDispatcher.on(MessageCreateEvent::class.java)
-            .subscribe { event: MessageCreateEvent ->
-                val msg = event.message.content.trim().split(" ").firstOrNull().orEmpty()
+    manager.on<ReadyEvent>()
+        .subscribe {
+            val user = it.jda.selfUser
+            LOG.info("Logged in as ${user.name}#${user.discriminator}")
+        }
+
+    CoroutineScope(Job()).launch {
+        manager.on<MessageReceivedEvent>()
+            .collect { event ->
+                val msg = event.message.contentRaw.trim().split(" ").firstOrNull().orEmpty()
                 val cmd = Command.values().find {
-                    it.aliases.any { alias -> msg == START_TAG + alias }
-                } ?: return@subscribe
+                    it.aliases.any { alias -> msg.lowercase(Locale.getDefault()) == START_TAG + alias }
+                } ?: return@collect
 
-                mono {
+                withContext(Dispatchers.Default) {
+                    LOG.info("Handling cmd: ${event.message}")
                     cmd.handlers.firstOrNull {
                         it.handle(event)
                     } ?: run {
                         LOG.warn("Failed to handle command", event)
                     }
-                }.block()
+                }
             }
+    }
 
-    client.eventDispatcher.on(VoiceStateUpdateEvent::class.java)
-            .subscribe { event ->
-                GuildVoiceManager.getVoice(event.current.guildId).checkIfShouldLeave()
+    CoroutineScope(Job()).launch {
+        manager.on<GenericGuildVoiceUpdateEvent>()
+            .collect { event ->
+                LOG.info("Voice event: $event")
+                GuildVoiceManager.getVoice(event.guild.id).checkIfShouldLeave()
             }
+    }
 
-
-    client.onDisconnect().block()
+    Token.loadFromFile()
+    JDABuilder.createDefault(Token.get())
+        .setEventManager(manager)
+        .build()
 }

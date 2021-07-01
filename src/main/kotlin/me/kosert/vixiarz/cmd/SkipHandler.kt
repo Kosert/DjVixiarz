@@ -1,16 +1,11 @@
 package me.kosert.vixiarz.cmd
 
-import discord4j.core.event.domain.message.MessageCreateEvent
-import me.kosert.vixiarz.LOG
-import me.kosert.vixiarz.channel
 import me.kosert.vixiarz.voiceController
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 
 object SkipHandler : IHandler {
-    override suspend fun handle(event: MessageCreateEvent): Boolean {
-        LOG.info("Skip")
-        event.channel()?.createEmbed {
-            event.voiceController()?.skip()?.create(it)
-        }?.block()
+    override suspend fun handle(event: MessageReceivedEvent): Boolean {
+        event.channel.sendMessage(event.voiceController().skip()).complete()
         return true
     }
 }

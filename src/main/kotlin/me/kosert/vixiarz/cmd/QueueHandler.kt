@@ -1,16 +1,12 @@
 package me.kosert.vixiarz.cmd
 
-import discord4j.core.event.domain.message.MessageCreateEvent
-import me.kosert.vixiarz.channel
 import me.kosert.vixiarz.voiceController
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 
 object QueueHandler : IHandler {
 
-    override suspend fun handle(event: MessageCreateEvent): Boolean {
-
-        event.channel()?.createEmbed {
-            event.voiceController()?.queue()?.create(it)
-        }?.block()
+    override suspend fun handle(event: MessageReceivedEvent): Boolean {
+        event.channel.sendMessage(event.voiceController().queue()).complete()
         return true
     }
 }

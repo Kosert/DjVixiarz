@@ -1,7 +1,6 @@
 package me.kosert.vixiarz.cmd
 
-import discord4j.core.event.domain.message.MessageCreateEvent
-import me.kosert.vixiarz.channel
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import java.nio.file.Paths
 
 abstract class GifHandler : IHandler {
@@ -10,11 +9,9 @@ abstract class GifHandler : IHandler {
     open val visibleName: String
         get() = gifFilename
 
-    override suspend fun handle(event: MessageCreateEvent): Boolean {
-        event.channel()?.createMessage {
-            val file = Paths.get(System.getProperty("user.dir"), GIF_FOLDER_NAME, gifFilename).toFile()
-            it.addFile(visibleName, file.inputStream())
-        }?.block()
+    override suspend fun handle(event: MessageReceivedEvent): Boolean {
+        val file = Paths.get(System.getProperty("user.dir"), GIF_FOLDER_NAME, gifFilename).toFile()
+        event.channel.sendFile(file.inputStream(), visibleName).complete()
         return true
     }
 

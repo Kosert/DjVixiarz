@@ -1,16 +1,14 @@
 package me.kosert.vixiarz.cmd
 
-import discord4j.core.event.domain.message.MessageCreateEvent
-import discord4j.rest.util.Color
-import me.kosert.vixiarz.orNull
-import me.kosert.vixiarz.voiceController
+import me.kosert.vixiarz.audio.GuildVoiceManager
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 
 object JoinHandler : IHandler {
 
-    override suspend fun handle(event: MessageCreateEvent): Boolean {
-        val voiceState = event.member.orNull()?.voiceState?.block()
-        val channel = voiceState?.channel?.block() ?: return false
-        event.voiceController()?.join(channel)
+    override suspend fun handle(event: MessageReceivedEvent): Boolean {
+        val channel = event.member?.voiceState?.channel ?: return false
+        val guildId = channel.guild.id
+        GuildVoiceManager.getVoice(guildId).join(channel)
         return true
     }
 }

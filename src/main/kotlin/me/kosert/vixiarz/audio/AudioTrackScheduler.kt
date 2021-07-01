@@ -31,6 +31,15 @@ class AudioTrackScheduler(
         player.isPaused = pause
     }
 
+    /**
+     * index 0 = first item in queue (does not include playing track)
+     */
+    fun remove(index: Int): AudioTrack? {
+        return if (index in 0..queue.lastIndex) {
+            queue.removeAt(index)
+        } else null
+    }
+
     fun skip(): Boolean {
         if (player.playingTrack == null)
             return false

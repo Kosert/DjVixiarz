@@ -1,28 +1,23 @@
 package me.kosert.vixiarz.cmd
 
-import discord4j.core.event.domain.message.MessageCreateEvent
-import discord4j.rest.util.Color
-import me.kosert.vixiarz.Const.FOOTER_TEXT
-import me.kosert.vixiarz.channel
-import me.kosert.vixiarz.orNull
+import me.kosert.vixiarz.createEmbed
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent
+import java.util.*
 
 object RequireDjHandler : IHandler {
 
-    override suspend fun handle(event: MessageCreateEvent): Boolean {
+    override suspend fun handle(event: MessageReceivedEvent): Boolean {
         val isDJ = event.member
-                .orNull()
                 ?.roles
-                ?.any { it.name.toUpperCase() == "DJ" }
-                ?.block()
+                ?.any { it.name.uppercase(Locale.getDefault()) == "DJ" }
                 ?: false
 
         if (!isDJ) {
-            event.channel()?.createEmbed {
-                it.setTitle("Nie dla psa, dla pana to")
-                it.setDescription("Brak uprawnień")
-                it.setColor(Color.PINK)
-                it.setFooter(FOOTER_TEXT, null)
-            }?.block()
+            val embed = createEmbed {
+                setTitle("Nie dla psa, dla pana to")
+                setDescription("Brak uprawnień")
+            }
+            event.channel.sendMessage(embed)
             return true
         }
 

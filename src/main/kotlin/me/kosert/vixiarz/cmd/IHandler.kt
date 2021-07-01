@@ -1,11 +1,11 @@
 package me.kosert.vixiarz.cmd
 
-import discord4j.core.event.domain.message.MessageCreateEvent
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 
 interface IHandler {
 
     /**
      * return true if was handled
      */
-    suspend fun handle(event: MessageCreateEvent): Boolean
+    suspend fun handle(event: MessageReceivedEvent): Boolean
 }
