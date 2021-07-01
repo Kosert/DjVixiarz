@@ -4,14 +4,13 @@ import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack
+import me.kosert.vixiarz.*
 import me.kosert.vixiarz.Const.ERROR_TITLE
-import me.kosert.vixiarz.LOG
 import me.kosert.vixiarz.audio.PlayerManager.PLAYER_MANAGER
-import me.kosert.vixiarz.createEmbed
-import me.kosert.vixiarz.formatAsDuration
 import net.dv8tion.jda.api.entities.Member
 import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.entities.VoiceChannel
+import java.awt.Color
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -21,7 +20,7 @@ class VoiceChannelController {
     private var currentChannel: VoiceChannel? = null
 
     private val player = PLAYER_MANAGER.createPlayer()
-    private val scheduler = AudioTrackScheduler(player)
+    private val scheduler = AudioTrackScheduler(player, ::handleException)
     private val audioHandler = AudioPlayerSendHandler(player)
 
     init {
@@ -53,14 +52,32 @@ class VoiceChannelController {
         currentChannel = null
     }
 
+    private fun handleException(exception: Exception, track: AudioTrack?) {
+        val channelId = track?.songInfo?.originChannelId
+        val channel = currentChannel?.guild?.textChannels?.find { it.id == channelId } ?: return
 
-    suspend fun play(member: Member, url: String): MessageEmbed {
+        createEmbed {
+            setTitle(ERROR_TITLE)
+            setDescription("Dojebało Exception: $exception")
+            exception.eachCause {
+                addField("Caused by", it.message, false)
+            }
+            setColor(Color.PINK)
+            setFooter(Const.FOOTER_TEXT, null)
+        }.send(channel)
+    }
+
+    suspend fun play(member: Member, url: String, originId: String): MessageEmbed {
 
         return suspendCoroutine { cont ->
             PLAYER_MANAGER.loadItemOrdered(this, url, object : AudioLoadResultHandler {
                 override fun trackLoaded(track: AudioTrack) {
                     val user = member.user
-                    track.userData = SongInfo("${user.name}#${user.discriminator}", user.avatarUrl.orEmpty())
+                    track.userData = SongInfo(
+                        "${user.name}#${user.discriminator}",
+                        user.avatarUrl.orEmpty(),
+                        originId
+                    )
                     scheduler.play(track)
 
                     cont.resume(createEmbed {
@@ -131,7 +148,11 @@ class VoiceChannelController {
     }
 
     fun undo(issuerName: String): MessageEmbed {
-        val index = scheduler.getQueue().indexOfLast { track -> track.songInfo.adder == issuerName }
+        val index = scheduler.getQueue()
+            .plus(currentSong)
+            .filterNotNull()
+            .indexOfLast { track -> track.songInfo.adder == issuerName }
+
         return if (index >= 0) {
             remove(index)
         } else createEmbed {

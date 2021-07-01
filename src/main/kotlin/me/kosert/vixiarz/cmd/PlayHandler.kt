@@ -50,7 +50,7 @@ object PlayHandler : IHandler {
         }
 
         val adder = event.member ?: return@coroutineScope true
-        val embedResult = event.voiceController().play(adder, url)
+        val embedResult = event.voiceController().play(adder, url, event.message.channel.id)
         event.channel.sendMessage(embedResult).complete()
         return@coroutineScope true
     }

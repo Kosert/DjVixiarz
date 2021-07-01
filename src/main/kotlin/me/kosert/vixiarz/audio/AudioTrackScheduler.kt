@@ -2,14 +2,14 @@ package me.kosert.vixiarz.audio
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer
 import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter
+import com.sedmelluq.discord.lavaplayer.tools.FriendlyException
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack
-import kotlin.jvm.JvmOverloads
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason
-import java.util.Collections
-import java.util.LinkedList
+import java.util.*
 
 class AudioTrackScheduler(
-    private val player: AudioPlayer
+    private val player: AudioPlayer,
+    private val exceptionHandler: (Exception, AudioTrack?) -> Unit
 ) : AudioEventAdapter() {
 
     // The queue may be modifed by different threads so guarantee memory safety
@@ -61,6 +61,12 @@ class AudioTrackScheduler(
         if (endReason.mayStartNext && queue.isNotEmpty())
             play(queue.removeAt(0), true)
     }
+
+    override fun onTrackException(
+        player: AudioPlayer,
+        track: AudioTrack?,
+        exception: FriendlyException
+    ) = exceptionHandler(exception, track)
 
     fun clear() {
         player.stopTrack()

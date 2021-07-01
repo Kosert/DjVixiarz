@@ -4,7 +4,8 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack
 
 class SongInfo(
     val adder: String,
-    val adderAvatarUrl: String
+    val adderAvatarUrl: String,
+    val originChannelId: String
     //val imgUrl: String
 )
 

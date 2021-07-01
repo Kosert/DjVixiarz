@@ -9,10 +9,7 @@ import me.kosert.vixiarz.audio.GuildVoiceManager
 import me.kosert.vixiarz.auth.Token
 import me.kosert.vixiarz.cmd.Command
 import net.dv8tion.jda.api.JDABuilder
-import net.dv8tion.jda.api.entities.Activity
 import net.dv8tion.jda.api.events.ReadyEvent
-import net.dv8tion.jda.api.events.channel.voice.GenericVoiceChannelEvent
-import net.dv8tion.jda.api.events.channel.voice.update.GenericVoiceChannelUpdateEvent
 import net.dv8tion.jda.api.events.guild.voice.GenericGuildVoiceUpdateEvent
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import reactor.util.Logger
