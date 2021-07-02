@@ -149,7 +149,7 @@ class VoiceChannelController {
 
     fun undo(issuerName: String): MessageEmbed {
         val index = scheduler.getQueue()
-            .plus(currentSong)
+            .prepend(currentSong)
             .filterNotNull()
             .indexOfLast { track -> track.songInfo.adder == issuerName }
 

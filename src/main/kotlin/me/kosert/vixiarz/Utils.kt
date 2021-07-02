@@ -43,3 +43,5 @@ fun Throwable.eachCause(action: (Throwable) -> Unit) {
         it.cause?.eachCause(action)
     }
 }
+
+fun <T> Collection<T>.prepend(element: T): List<T> = listOf(element) + this
