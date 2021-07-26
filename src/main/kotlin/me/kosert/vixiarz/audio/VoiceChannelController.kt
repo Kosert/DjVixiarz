@@ -135,9 +135,15 @@ class VoiceChannelController {
             val url = "https://www.youtube.com/watch?v=" + track.identifier
             val time = track.position.formatAsDuration() + "/" + track.duration.formatAsDuration()
 
+            val header = if (player.isPaused)
+                "Muzyka spauzowana - wpisz !resume żeby wznowić\n"
+            else
+                ""
+
             createEmbed {
                 setTitle("Teraz leci:")
-                setDescription("[$title]($url)\n" +
+                setDescription(header +
+                        "[$title]($url)\n" +
                         "${track.info.author}\n\n" +
                         "`" + time + "`\n" +
                         "Dodane przez `${track.songInfo.adder}`")
@@ -189,6 +195,10 @@ class VoiceChannelController {
         if (player.playingTrack == null) {
             setDescription("Nie mam nic w kłełe :(")
             return@createEmbed
+        }
+
+        if (player.isPaused) {
+            setDescription("Muzyka spauzowana - wpisz !resume żeby wznowić")
         }
 
         val queue = listOf(player.playingTrack) + scheduler.getQueue()
