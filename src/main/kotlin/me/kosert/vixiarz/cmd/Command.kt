@@ -27,6 +27,7 @@ enum class Command(
     // LYRICS(listOf("lyrics"), LyricsHandler, help = "Pokazuje tekst piosenki"),
 
     URBAN_JUNGLE(listOf("miejskadżungla", "miejskadzungla", "dzungla"), JungleHandler),
-    POPE(listOf("rarepope", "pope", "jp2"), PopeHandler)
+    POPE(listOf("rarepope", "pope", "jp2"), PopeHandler),
+    PUSHER(listOf("pusher", "babahassan"), PusherHandler)
 
 }
