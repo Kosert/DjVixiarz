@@ -15,10 +15,13 @@ object HelpHandler : IHandler {
             setColor(Color.PINK)
             setDescription("Help:")
             Command.values().forEach { cmd ->
+                val adminRequired = cmd.handlers.any { it is RequireDjHandler }
                 cmd.help?.let {
-                    addField(START_TAG + cmd.aliases.first(), it, true)
+                    val postfix = (if (adminRequired) " (*)" else "")
+                    addField(START_TAG + cmd.aliases.first() + postfix, it, true)
                 }
             }
+            addField("(*) - Komenda wymaga rangi 'DJ'", "", false)
             setFooter(FOOTER_TEXT, null)
         }
 
