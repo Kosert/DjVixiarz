@@ -28,6 +28,7 @@ enum class Command(
 
     URBAN_JUNGLE(listOf("miejskadżungla", "miejskadzungla", "dzungla"), JungleHandler),
     POPE(listOf("rarepope", "pope", "jp2"), PopeHandler),
-    PUSHER(listOf("pusher", "babahassan"), PusherHandler)
+    PUSHER(listOf("pusher", "babahassan"), PusherHandler),
+    METRONOME(listOf("piotras", "metronome", "tiktok"), MetronomeHandler)
 
 }
