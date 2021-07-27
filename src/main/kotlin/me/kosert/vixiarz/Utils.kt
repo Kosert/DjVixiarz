@@ -37,10 +37,9 @@ fun Long.formatAsDuration(): String {
 
 fun MessageEmbed.send(channel: MessageChannel) = channel.sendMessage(this).complete()
 
-fun Throwable.eachCause(action: (Throwable) -> Unit) {
-    cause?.let {
-        action(it)
-        it.cause?.eachCause(action)
+fun Throwable.causesSequence(): Sequence<Throwable> {
+    return generateSequence(this.cause) {
+        it.cause.takeUnless { it === this }
     }
 }
 

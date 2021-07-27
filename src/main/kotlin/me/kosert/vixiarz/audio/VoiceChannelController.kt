@@ -59,8 +59,8 @@ class VoiceChannelController {
         createEmbed {
             setTitle(ERROR_TITLE)
             setDescription("Dojebało Exception: $exception")
-            exception.eachCause {
-                addField("Caused by", it.message, false)
+            exception.causesSequence().take(4).forEach {
+                addField("Caused by", it.toString(), false)
             }
             setColor(Color.PINK)
             setFooter(Const.FOOTER_TEXT, null)
