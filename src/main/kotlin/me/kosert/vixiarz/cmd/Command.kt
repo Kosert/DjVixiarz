@@ -24,6 +24,8 @@ enum class Command(
     PAUSE(listOf("pause", "stop"), PauseHandler, help = "Pauza"),
     RESUME(listOf("resume"), ResumeHandler, help = "Wznawia"),
 
+    SCHEDULE(listOf("ktogra"), ScheduleHandler, help = "Pokazuje kto dzisiaj gra"),
+
     // LYRICS(listOf("lyrics"), LyricsHandler, help = "Pokazuje tekst piosenki"),
 
     URBAN_JUNGLE(listOf("miejskadżungla", "miejskadzungla", "dzungla"), JungleHandler),

@@ -2,6 +2,7 @@ package me.kosert.vixiarz
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.datetime.*
 import me.kosert.vixiarz.audio.GuildVoiceManager
 import me.kosert.vixiarz.audio.VoiceChannelController
 import me.sargunvohra.lib.ktunits.milliseconds
@@ -9,7 +10,7 @@ import net.dv8tion.jda.api.entities.MessageChannel
 import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import java.awt.Color
-import java.util.*
+import java.util.Optional
 
 fun MessageReceivedEvent.voiceController(): VoiceChannelController {
     return this.guild.id.let { GuildVoiceManager.getVoice(it) }
@@ -44,3 +45,13 @@ fun Throwable.causesSequence(): Sequence<Throwable> {
 }
 
 fun <T> Collection<T>.prepend(element: T): List<T> = listOf(element) + this
+
+fun LocalDateTime.isToday(): Boolean {
+    val today = Clock.System.todayAt(TimeZone.currentSystemDefault())
+    return today == this.date
+}
+
+fun Long.addIf(amount: Long, predicate: () -> Boolean): Long {
+    return if (predicate()) this + amount
+    else this
+}

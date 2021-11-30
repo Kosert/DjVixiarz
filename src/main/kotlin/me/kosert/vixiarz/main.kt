@@ -6,7 +6,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.reactive.collect
 import me.kosert.vixiarz.Const.START_TAG
 import me.kosert.vixiarz.audio.GuildVoiceManager
-import me.kosert.vixiarz.auth.Token
+import me.kosert.vixiarz.auth.Secrets
 import me.kosert.vixiarz.cmd.Command
 import net.dv8tion.jda.api.JDABuilder
 import net.dv8tion.jda.api.events.ReadyEvent
@@ -56,8 +56,9 @@ suspend fun main() {
             }
     }
 
-    Token.loadFromFile()
-    JDABuilder.createDefault(Token.get())
+    Secrets.loadFromFile()
+
+    JDABuilder.createDefault(Secrets.getDiscordToken())
         .setEventManager(manager)
         .build()
 }

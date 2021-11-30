@@ -35,4 +35,5 @@ dependencies {
     implementation 'com.github.kittinunf.fuel:fuel:2.3.1'
     implementation 'com.github.kittinunf.fuel:fuel-coroutines:2.3.1'
     implementation("it.skrape:skrapeit:1.1.1")
+    implementation "org.jetbrains.kotlinx:kotlinx-datetime:0.2.1"
 }
