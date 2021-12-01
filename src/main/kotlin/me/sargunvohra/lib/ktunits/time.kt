@@ -36,4 +36,7 @@ data class TimeValue internal constructor(internal val ns: Long) {
     val toMinutes = toSeconds / 60
     val toHours = toMinutes / 60
     val toDays = toHours / 24
+
+    operator fun plus(other: TimeValue): TimeValue = TimeValue(this.ns + other.ns)
+
 }

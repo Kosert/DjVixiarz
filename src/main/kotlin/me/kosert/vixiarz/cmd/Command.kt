@@ -1,5 +1,10 @@
 package me.kosert.vixiarz.cmd
 
+import me.kosert.vixiarz.cmd.gif.JungleHandler
+import me.kosert.vixiarz.cmd.gif.MetronomeHandler
+import me.kosert.vixiarz.cmd.gif.PopeHandler
+import me.kosert.vixiarz.cmd.gif.PusherHandler
+
 enum class Command(
     val aliases: List<String>,
     vararg val handlers: IHandler,
@@ -23,6 +28,7 @@ enum class Command(
 
     PAUSE(listOf("pause", "stop"), PauseHandler, help = "Pauza"),
     RESUME(listOf("resume"), ResumeHandler, help = "Wznawia"),
+    SEEK(listOf("seek", "time"), SeekHandler(), help = "Przewija do podanego momentu"),
 
     SCHEDULE(listOf("ktogra"), ScheduleHandler, help = "Pokazuje kto dzisiaj gra"),
 

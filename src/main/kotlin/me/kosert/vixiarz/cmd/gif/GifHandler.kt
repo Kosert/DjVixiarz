@@ -1,5 +1,6 @@
-package me.kosert.vixiarz.cmd
+package me.kosert.vixiarz.cmd.gif
 
+import me.kosert.vixiarz.cmd.IHandler
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import java.nio.file.Paths
 

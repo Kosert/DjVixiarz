@@ -1,4 +1,4 @@
-package me.kosert.vixiarz.cmd
+package me.kosert.vixiarz.cmd.gif
 
 object MetronomeHandler : GifHandler() {
 
