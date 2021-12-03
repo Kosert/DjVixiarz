@@ -4,6 +4,7 @@ import kotlinx.datetime.toKotlinLocalDateTime
 import me.kosert.vixiarz.LOG
 import me.sargunvohra.lib.ktunits.hours
 import me.sargunvohra.lib.ktunits.minutes
+import me.sargunvohra.lib.ktunits.seconds
 import java.lang.IllegalArgumentException
 import java.time.LocalDateTime
 import kotlinx.datetime.LocalDateTime as KotlinLocalDateTime
@@ -37,7 +38,7 @@ sealed class Presence(val isPlaying: Boolean) {
             val endTime = when {
                 endTime == null -> Time(23, 59, 59)
                 endTime < startTime -> Time(23, 59, 59)
-                else -> endTime
+                else -> endTime - 1.seconds
             }
 
             if (startTime >= nextHour)
@@ -45,7 +46,7 @@ sealed class Presence(val isPlaying: Boolean) {
 
             return buildString {
                 repeat(4) {
-                    val time = (thisHour + (4 * 15).minutes).takeIf { it >= thisHour } ?: Time(23, 59, 59)
+                    val time = (thisHour + (it * 15).minutes).takeIf { it >= thisHour } ?: Time(23, 59, 59)
                     if (time in startTime..endTime)
                         append("=")
                     else
