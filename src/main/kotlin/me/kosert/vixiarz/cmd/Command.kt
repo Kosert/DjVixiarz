@@ -28,7 +28,7 @@ enum class Command(
 
     PAUSE(listOf("pause", "stop"), PauseHandler, help = "Pauza"),
     RESUME(listOf("resume"), ResumeHandler, help = "Wznawia"),
-    SEEK(listOf("seek", "time"), SeekHandler(), help = "Przewija do podanego momentu"),
+    SEEK(listOf("seek", "time"), RequireDjHandler, SeekHandler(), help = "Przewija do podanego momentu"),
 
     SCHEDULE(listOf("ktogra"), ScheduleHandler, help = "Pokazuje kto dzisiaj gra"),
 

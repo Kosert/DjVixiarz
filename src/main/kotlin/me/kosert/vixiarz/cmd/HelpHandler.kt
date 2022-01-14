@@ -1,7 +1,7 @@
 package me.kosert.vixiarz.cmd
 
-import me.kosert.vixiarz.Const.FOOTER_TEXT
 import me.kosert.vixiarz.Const.START_TAG
+import me.kosert.vixiarz.FooterGenerator
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import java.awt.Color
@@ -22,7 +22,7 @@ object HelpHandler : IHandler {
                 }
             }
             addField("(*) - Komenda wymaga rangi 'DJ'", "", false)
-            setFooter(FOOTER_TEXT, null)
+            setFooter(FooterGenerator.generate(), null)
         }
 
         event.channel.sendMessage(embed.build()).complete()

@@ -5,6 +5,7 @@ import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason
+import me.kosert.vixiarz.LOG
 import java.util.*
 
 class AudioTrackScheduler(
@@ -17,6 +18,8 @@ class AudioTrackScheduler(
     private val queue: MutableList<AudioTrack> = Collections.synchronizedList(LinkedList())
 
     fun getQueue(): List<AudioTrack> = queue
+
+//    private var lastFail: Pair<Long, AudioTrack?>? = null
 
     @JvmOverloads
     fun play(track: AudioTrack, force: Boolean = false): Boolean {
@@ -58,6 +61,7 @@ class AudioTrackScheduler(
         endReason: AudioTrackEndReason
     ) {
         // Advance the player if the track completed naturally (FINISHED) or if the track cannot play (LOAD_FAILED)
+        LOG.info("TrackEnd: $endReason, mayStartNext: ${endReason.mayStartNext} - $track")
         if (endReason.mayStartNext && queue.isNotEmpty())
             play(queue.removeAt(0), true)
     }
@@ -66,7 +70,21 @@ class AudioTrackScheduler(
         player: AudioPlayer,
         track: AudioTrack?,
         exception: FriendlyException
-    ) = exceptionHandler(exception, track)
+    ) {
+        LOG.info("onTrackException: $track")
+
+//        lastFail
+//            ?.takeIf { it.second?.identifier == track?.identifier }
+//            ?.takeIf { System.currentTimeMillis() - it.first > 2000 }
+//            ?.second
+//            ?.let {
+//                LOG.info("Retrying: $track")
+//                player.startTrack(it, true)
+//            }
+//        lastFail = System.currentTimeMillis() to track
+
+        exceptionHandler(exception, track)
+    }
 
     fun clear() {
         player.stopTrack()

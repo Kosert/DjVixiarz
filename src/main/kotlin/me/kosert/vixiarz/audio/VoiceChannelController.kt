@@ -63,7 +63,7 @@ class VoiceChannelController {
                 addField("Caused by", it.toString(), false)
             }
             setColor(Color.PINK)
-            setFooter(Const.FOOTER_TEXT, null)
+            setFooter(FooterGenerator.generate(), null)
         }.send(channel)
     }
 
@@ -84,7 +84,11 @@ class VoiceChannelController {
                         setTitle("Dodaje:")
                         setDescription(track.info.title)
                         addField("Autor", track.info.author ?: "Nieznany", true)
-                        addField("Długość", track.info.length.formatAsDuration(), true)
+                        val duration = if (track.info.isStream)
+                            track.info.length.formatAsDuration()
+                        else
+                            "NA ŻYWO"
+                        addField("Długość", duration, true)
                     })
                 }
 
@@ -132,8 +136,11 @@ class VoiceChannelController {
         return player.playingTrack?.let { track ->
 
             val title = track.info.title
-            val url = "https://www.youtube.com/watch?v=" + track.identifier
-            val time = track.position.formatAsDuration() + "/" + track.duration.formatAsDuration()
+            val url = /*"https://www.youtube.com/watch?v=" + */ track.info.uri
+            val time = if (track.info.isStream)
+                    "NA ŻYWO"
+                else
+                    track.position.formatAsDuration() + "/" + track.duration.formatAsDuration()
 
             val header = if (player.isPaused)
                 "Muzyka spauzowana - wpisz !resume żeby wznowić\n"
@@ -210,7 +217,7 @@ class VoiceChannelController {
             )
         }
 
-        val length = scheduler.getQueue().sumBy { it.duration.toInt() }
+        val length = scheduler.getQueue().sumOf { it.duration.toInt() }
         val currentLeft = player.playingTrack.duration - player.playingTrack.position
         val total = currentLeft + length
         addField("Pozostała długość:", total.formatAsDuration(), false)

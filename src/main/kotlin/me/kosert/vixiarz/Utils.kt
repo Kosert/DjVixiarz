@@ -21,7 +21,7 @@ suspend fun MessageChannel.sendError(text: String) = withContext(Dispatchers.IO)
         setTitle(Const.ERROR_TITLE)
         setDescription(text)
         setColor(Color.PINK)
-        setFooter(Const.FOOTER_TEXT, null)
+        setFooter(FooterGenerator.generate(), null)
     }
     sendMessage(embed).complete()
 }
