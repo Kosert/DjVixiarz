@@ -85,9 +85,9 @@ class VoiceChannelController {
                         setDescription(track.info.title)
                         addField("Autor", track.info.author ?: "Nieznany", true)
                         val duration = if (track.info.isStream)
-                            track.info.length.formatAsDuration()
-                        else
                             "NA ŻYWO"
+                        else
+                            track.info.length.formatAsDuration()
                         addField("Długość", duration, true)
                     })
                 }
