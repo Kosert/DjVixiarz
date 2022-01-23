@@ -30,13 +30,15 @@ enum class Command(
     RESUME(listOf("resume"), ResumeHandler, help = "Wznawia"),
     SEEK(listOf("seek", "time"), RequireDjHandler, SeekHandler(), help = "Przewija do podanego momentu"),
 
-    SCHEDULE(listOf("ktogra"), ScheduleHandler, help = "Pokazuje kto dzisiaj gra"),
+    CLEAR(listOf("clear"), RequireDjHandler, ClearHandler(), help = "Czyści kłełe"),
+
+    SCHEDULE(listOf("ktogra"), ScheduleHandler, help = "Pokazuje harmonogram kotożerców"),
 
     // LYRICS(listOf("lyrics"), LyricsHandler, help = "Pokazuje tekst piosenki"),
 
     URBAN_JUNGLE(listOf("miejskadżungla", "miejskadzungla", "dzungla"), JungleHandler),
     POPE(listOf("rarepope", "pope", "jp2"), PopeHandler),
     PUSHER(listOf("pusher", "babahassan"), PusherHandler),
-    METRONOME(listOf("piotras", "metronome", "tiktok"), MetronomeHandler)
+    METRONOME(listOf("piotras", "metronome", "tiktok"), MetronomeHandler),
 
 }

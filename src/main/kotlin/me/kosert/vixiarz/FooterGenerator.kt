@@ -20,6 +20,7 @@ object FooterGenerator {
         "Wypróbuj !Piotras",
         "Wypróbuj !dzungla",
         "Robson = Radek",
+        "Zaczarowany burdel O O O"
     )
 
     fun generate(): String = footers.random() + " ( ͡° ͜ʖ ͡°)"

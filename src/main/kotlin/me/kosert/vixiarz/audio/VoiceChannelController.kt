@@ -72,13 +72,7 @@ class VoiceChannelController {
         return suspendCoroutine { cont ->
             PLAYER_MANAGER.loadItemOrdered(this, url, object : AudioLoadResultHandler {
                 override fun trackLoaded(track: AudioTrack) {
-                    val user = member.user
-                    track.userData = SongInfo(
-                        "${user.name}#${user.discriminator}",
-                        user.avatarUrl.orEmpty(),
-                        originId
-                    )
-                    scheduler.play(track)
+                    scheduleTrack(track)
 
                     cont.resume(createEmbed {
                         setTitle("Dodaje:")
@@ -93,11 +87,43 @@ class VoiceChannelController {
                 }
 
                 override fun playlistLoaded(playlist: AudioPlaylist) {
-                    //todo handle playlists
+                    playlist.selectedTrack?.let {
+                        this.trackLoaded(it)
+                        return
+                    }
+
+                    playlist.tracks.forEach {
+                        scheduleTrack(it)
+                    }
+
                     cont.resume(createEmbed {
-                        setTitle(ERROR_TITLE)
-                        setDescription("Nie obsługuje jeszcze playlist byczq")
+                        setTitle("Dodaje ${playlist.tracks.size} piosenek")
+                        setDescription(playlist.name)
+
+                        playlist.tracks.take(3).forEach {
+                            addField(it.info.title, it.info.author ?: "Nieznany", false)
+                        }
+                        val remaining = playlist.tracks.size - 3
+                        if (remaining > 0) {
+                            addField("... i jeszcze $remaining", "¯\\_(ツ)_/¯", true)
+                        }
+
+                        addField(
+                            "Łączna długość",
+                            playlist.tracks.sumOf { it.duration }.formatAsDuration(asText = true),
+                            true
+                        )
                     })
+                }
+
+                private fun scheduleTrack(track: AudioTrack) {
+                    val user = member.user
+                    track.userData = SongInfo(
+                        "${user.name}#${user.discriminator}",
+                        user.avatarUrl.orEmpty(),
+                        originId
+                    )
+                    scheduler.play(track)
                 }
 
                 override fun noMatches() {
@@ -136,11 +162,11 @@ class VoiceChannelController {
         return player.playingTrack?.let { track ->
 
             val title = track.info.title
-            val url = /*"https://www.youtube.com/watch?v=" + */ track.info.uri
+            val url = track.info.uri
             val time = if (track.info.isStream)
-                    "NA ŻYWO"
-                else
-                    track.position.formatAsDuration() + "/" + track.duration.formatAsDuration()
+                "NA ŻYWO"
+            else
+                track.position.formatAsDuration() + "/" + track.duration.formatAsDuration()
 
             val header = if (player.isPaused)
                 "Muzyka spauzowana - wpisz !resume żeby wznowić\n"
@@ -149,11 +175,13 @@ class VoiceChannelController {
 
             createEmbed {
                 setTitle("Teraz leci:")
-                setDescription(header +
-                        "[$title]($url)\n" +
-                        "${track.info.author}\n\n" +
-                        "`" + time + "`\n" +
-                        "Dodane przez `${track.songInfo.adder}`")
+                setDescription(
+                    header +
+                            "[$title]($url)\n" +
+                            "${track.info.author}\n\n" +
+                            "`" + time + "`\n" +
+                            "Dodane przez `${track.songInfo.adder}`"
+                )
             }
         } ?: createEmbed {
             setTitle("Nic teraz nie leci :/")
@@ -197,6 +225,11 @@ class VoiceChannelController {
             createEmbed { setTitle("Nie mam nic do skipnięcia byczq") }
     }
 
+    fun clear(): MessageEmbed {
+        scheduler.clear()
+        return createEmbed { setTitle("Kłełe wyczyszczone") }
+    }
+
     fun queue() = createEmbed {
         setTitle("Kłełe:")
         if (player.playingTrack == null) {
@@ -206,20 +239,27 @@ class VoiceChannelController {
 
         if (player.isPaused) {
             setDescription("Muzyka spauzowana - wpisz !resume żeby wznowić")
+        } else if (scheduler.getQueue().isNotEmpty()){
+            setDescription("W kolejce jest ${scheduler.getQueue().size} piosenek")
         }
 
         val queue = listOf(player.playingTrack) + scheduler.getQueue()
-        queue.forEachIndexed { index, track ->
+        queue.take(21).forEachIndexed { index, track ->
             val prefix = if (index == 0) "Teraz: " else "$index. "
-            addField(prefix + track.info.title,
-                    "Dodane przez `${track.songInfo.adder}`",
-                    false
+            addField(
+                prefix + track.info.title,
+                "Dodane przez `${track.songInfo.adder}`",
+                false
             )
         }
+        val remaining = queue.size - 21
+        if (remaining > 0) {
+            addField("... i jeszcze $remaining", "¯\\_(ツ)_/¯", true)
+        }
 
-        val length = scheduler.getQueue().sumOf { it.duration.toInt() }
+        val length = scheduler.getQueue().sumOf { it.duration }
         val currentLeft = player.playingTrack.duration - player.playingTrack.position
         val total = currentLeft + length
-        addField("Pozostała długość:", total.formatAsDuration(), false)
+        addField("Pozostała długość:", total.formatAsDuration(asText = true), false)
     }
 }

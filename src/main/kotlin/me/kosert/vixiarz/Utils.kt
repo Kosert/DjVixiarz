@@ -28,12 +28,17 @@ suspend fun MessageChannel.sendError(text: String) = withContext(Dispatchers.IO)
 
 fun <T> Optional<T>.orNull(): T? = orElse(null)
 
-fun Long.formatAsDuration(): String {
+fun Long.formatAsDuration(asText: Boolean = false): String = if (!asText) {
     val minutes = milliseconds.toMinutes
     val seconds = milliseconds.toSeconds % 60
-
     val secondsString = if (seconds < 10) "0$seconds" else seconds
-    return "$minutes:$secondsString"
+    "$minutes:$secondsString"
+}
+else {
+    val hours = milliseconds.toHours.takeIf { it > 0 }?.let { it.toString() + "h" }
+    val minutes = (milliseconds.toMinutes % 60).takeIf { it > 0 }?.let { it.toString() + "min" }
+    val seconds = (milliseconds.toSeconds % 60).takeIf { it > 0 }?.let { it.toString() + "s" }
+    listOfNotNull(hours, minutes, seconds).joinToString(" ")
 }
 
 fun MessageEmbed.send(channel: MessageChannel) = channel.sendMessage(this).complete()
