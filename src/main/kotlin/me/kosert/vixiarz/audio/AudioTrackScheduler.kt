@@ -19,7 +19,7 @@ class AudioTrackScheduler(
 
     fun getQueue(): List<AudioTrack> = queue
 
-//    private var lastFail: Pair<Long, AudioTrack?>? = null
+    private var lastFail: Pair<Long, AudioTrack>? = null
 
     @JvmOverloads
     fun play(track: AudioTrack, force: Boolean = false): Boolean {
@@ -62,8 +62,30 @@ class AudioTrackScheduler(
     ) {
         // Advance the player if the track completed naturally (FINISHED) or if the track cannot play (LOAD_FAILED)
         LOG.info("TrackEnd: $endReason, mayStartNext: ${endReason.mayStartNext} - $track")
-        if (endReason.mayStartNext && queue.isNotEmpty())
-            play(queue.removeAt(0), true)
+
+        val canRetry = if (endReason == AudioTrackEndReason.LOAD_FAILED) {
+            // don't retry if fail was same song and just now
+            lastFail?.let {
+                val sameSongFail = it.second.identifier == track.identifier
+                val failWasMomentAgo = System.currentTimeMillis() - it.first < 2000
+                val timeDiff = System.currentTimeMillis() - it.first
+                LOG.info("sameSongFail: $sameSongFail, failWasMomentAgo: ${failWasMomentAgo} | $timeDiff")
+                !sameSongFail || !failWasMomentAgo
+            } ?: true
+        } else false
+
+        lastFail = System.currentTimeMillis() to track
+
+        when {
+            canRetry -> {
+                val cloned = track.makeClone()
+                LOG.info("Retrying: $cloned")
+                player.startTrack(cloned, true)
+            }
+            endReason.mayStartNext && queue.isNotEmpty() -> {
+                play(queue.removeAt(0), true)
+            }
+        }
     }
 
     override fun onTrackException(
@@ -72,17 +94,6 @@ class AudioTrackScheduler(
         exception: FriendlyException
     ) {
         LOG.info("onTrackException: $track")
-
-//        lastFail
-//            ?.takeIf { it.second?.identifier == track?.identifier }
-//            ?.takeIf { System.currentTimeMillis() - it.first > 2000 }
-//            ?.second
-//            ?.let {
-//                LOG.info("Retrying: $track")
-//                player.startTrack(it, true)
-//            }
-//        lastFail = System.currentTimeMillis() to track
-
         exceptionHandler(exception, track)
     }
 
