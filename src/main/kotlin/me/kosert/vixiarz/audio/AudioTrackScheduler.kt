@@ -13,7 +13,7 @@ class AudioTrackScheduler(
     private val exceptionHandler: (Exception, AudioTrack?) -> Unit
 ) : AudioEventAdapter() {
 
-    // The queue may be modifed by different threads so guarantee memory safety
+    // The queue may be modified by different threads so guarantee memory safety
     // This does not, however, remove several race conditions currently present
     private val queue: MutableList<AudioTrack> = Collections.synchronizedList(LinkedList())
 
