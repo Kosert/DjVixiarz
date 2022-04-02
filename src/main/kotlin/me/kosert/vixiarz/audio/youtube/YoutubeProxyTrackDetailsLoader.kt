@@ -19,6 +19,8 @@ import java.io.IOException
 import java.util.function.Consumer
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException.Severity.COMMON
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException.Severity.SUSPICIOUS
+import me.kosert.vixiarz.LOG
+import java.net.URLEncoder
 import java.nio.charset.StandardCharsets.UTF_8
 
 
@@ -84,6 +86,7 @@ class YoutubeProxyTrackDetailsLoader : YoutubeTrackDetailsLoader {
     ): YoutubeProxyTrackJsonData? {
         val data = YoutubeProxyTrackJsonData.fromMainResult(mainInfo!!)
         val status = checkPlayabilityStatus(data.playerResponse)
+        LOG.info("Playability status: $status")
         if (status == InfoStatus.DOES_NOT_EXIST) {
             return null
         }
@@ -92,8 +95,8 @@ class YoutubeProxyTrackDetailsLoader : YoutubeTrackDetailsLoader {
             return YoutubeProxyTrackJsonData.fromMainResult(trackInfo)
         }
         return if (requireFormats && status == InfoStatus.REQUIRES_LOGIN) {
-            val trackInfo = loadTrackInfoFromInnertube(httpInterface, videoId)
-            YoutubeProxyTrackJsonData.fromMainResult(trackInfo)
+            val playerResponse = loadTrackInfoFromProxy(httpInterface, videoId)
+            YoutubeProxyTrackJsonData(playerResponse, JsonBrowser.NULL_BROWSER, null)
         } else {
             data
         }
@@ -120,9 +123,7 @@ class YoutubeProxyTrackDetailsLoader : YoutubeTrackDetailsLoader {
             val unplayableReason = getUnplayableReason(statusBlock)
             throw FriendlyException(unplayableReason, COMMON, null)
         } else if ("LOGIN_REQUIRED" == status) {
-            val errorReason =
-                statusBlock["errorScreen"]["playerErrorMessageRenderer"]["reason"]["simpleText"]
-                    .text()
+            val errorReason = statusBlock["errorScreen"]["playerErrorMessageRenderer"]["reason"]["simpleText"].text()
             if ("Private video" == errorReason) {
                 throw FriendlyException("This is a private video.", COMMON, null)
             }
@@ -181,32 +182,26 @@ class YoutubeProxyTrackDetailsLoader : YoutubeTrackDetailsLoader {
             }
         }
     }
-
+    
     @Throws(IOException::class)
-    protected fun loadTrackInfoFromInnertube(
+    protected fun loadTrackInfoFromProxy(
         httpInterface: HttpInterface,
         videoId: String?
     ): JsonBrowser {
-        val post = HttpPost(PLAYER_REQUEST_URL)
-        val payload = StringEntity(String.format(PLAYER_REQUEST_PAYLOAD, videoId), "UTF-8")
-        post.entity = payload
-        httpInterface.execute(post).use { response ->
+        val config = InnerTubeConfiguration.default()
+        val url = "https://youtube-proxy.zerody.one/getPlayer" +
+                "?videoId=${URLEncoder.encode(videoId, "utf-8")}" +
+                "&reason=${URLEncoder.encode("LOGIN_REQUIRED", "utf-8")}" +
+                "&clientName=${config.INNERTUBE_CLIENT_NAME}" +
+                "&clientVersion=${config.INNERTUBE_CLIENT_VERSION}" +
+                "&signatureTimestamp=${config.STS}"
+
+        val get = HttpGet(url)
+        httpInterface.execute(get).use { response ->
             HttpClientTools.assertSuccessWithContent(response, "video info response")
-            val json: JsonBrowser =
-                JsonBrowser.parse(EntityUtils.toString(response.entity, UTF_8))
-            if (json != null) {
-                return json
-            }
-            log.error(
-                "Did not receive expected response from Innertube request on track {} response: {}",
-                videoId,
-                response
-            )
+            val json: JsonBrowser = JsonBrowser.parse(EntityUtils.toString(response.entity, UTF_8))
+            return json
         }
-        throw FriendlyException(
-            "Track requires age verification.", SUSPICIOUS,
-            IllegalStateException("Expected response is not present.")
-        )
     }
 
     @Throws(IOException::class)
