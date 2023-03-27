@@ -8,6 +8,8 @@ object GuildVoiceManager {
     private val managers = ConcurrentHashMap<String, VoiceChannelController>()
 
     fun getVoice(id: String): VoiceChannelController {
-        return managers.getOrPut(id, { VoiceChannelController() })
+        return managers.getOrPut(id) { VoiceChannelController() }
     }
+
+    fun getConnectedInfo() = managers.values.mapNotNull { it.getConnectedChannelInfo() }
 }

@@ -9,11 +9,13 @@ import me.kosert.vixiarz.audio.GuildVoiceManager
 import me.kosert.vixiarz.auth.Secrets
 import me.kosert.vixiarz.cmd.Command
 import net.dv8tion.jda.api.JDABuilder
-import net.dv8tion.jda.api.events.ReadyEvent
-import net.dv8tion.jda.api.events.guild.voice.GenericGuildVoiceUpdateEvent
+import net.dv8tion.jda.api.events.guild.voice.GenericGuildVoiceEvent
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
+import net.dv8tion.jda.api.events.session.ReadyEvent
+import net.dv8tion.jda.api.requests.GatewayIntent
 import reactor.util.Logger
 import reactor.util.Loggers
+import java.io.File
 import java.util.*
 
 val LOG: Logger = Loggers.getLogger("VixaLogger")
@@ -49,7 +51,7 @@ suspend fun main() {
     }
 
     CoroutineScope(Job()).launch {
-        manager.on<GenericGuildVoiceUpdateEvent>()
+        manager.on<GenericGuildVoiceEvent>()
             .collect { event ->
                 LOG.info("Voice event: $event")
                 GuildVoiceManager.getVoice(event.guild.id).checkIfShouldLeave()
@@ -58,7 +60,13 @@ suspend fun main() {
 
     Secrets.loadFromFile()
 
-    JDABuilder.createDefault(Secrets.getDiscordToken())
-        .setEventManager(manager)
-        .build()
+    JDABuilder.createDefault(
+        Secrets.getDiscordToken(),
+        GatewayIntent.MESSAGE_CONTENT,
+        GatewayIntent.GUILD_MESSAGES,
+        GatewayIntent.GUILD_MEMBERS,
+        GatewayIntent.GUILD_VOICE_STATES,
+    ).setEventManager(manager).build()
+
+    //runServer()
 }

@@ -6,8 +6,8 @@ import kotlinx.datetime.*
 import me.kosert.vixiarz.audio.GuildVoiceManager
 import me.kosert.vixiarz.audio.VoiceChannelController
 import me.sargunvohra.lib.ktunits.milliseconds
-import net.dv8tion.jda.api.entities.MessageChannel
 import net.dv8tion.jda.api.entities.MessageEmbed
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import java.awt.Color
 import java.util.Optional
@@ -23,7 +23,7 @@ suspend fun MessageChannel.sendError(text: String) = withContext(Dispatchers.IO)
         setColor(Color.PINK)
         setFooter(FooterGenerator.generate(), null)
     }
-    sendMessage(embed).complete()
+    sendMessageEmbeds(embed).complete()
 }
 
 fun <T> Optional<T>.orNull(): T? = orElse(null)
@@ -41,7 +41,7 @@ else {
     listOfNotNull(hours, minutes, seconds).joinToString(" ")
 }
 
-fun MessageEmbed.send(channel: MessageChannel) = channel.sendMessage(this).complete()
+fun MessageEmbed.send(channel: MessageChannel) = channel.sendMessageEmbeds(this).complete()
 
 fun Throwable.causesSequence(): Sequence<Throwable> {
     return generateSequence(this.cause) {

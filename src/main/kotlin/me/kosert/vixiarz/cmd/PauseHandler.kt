@@ -7,7 +7,7 @@ object PauseHandler : IHandler {
 
     override suspend fun handle(event: MessageReceivedEvent): Boolean {
         event.voiceController().setPause(true)?.let {
-            event.channel.sendMessage(it).complete()
+            event.channel.sendMessageEmbeds(it).complete()
         }
         return true
     }

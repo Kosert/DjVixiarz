@@ -25,7 +25,7 @@ object HelpHandler : IHandler {
             setFooter(FooterGenerator.generate(), null)
         }
 
-        event.channel.sendMessage(embed.build()).complete()
+        event.channel.sendMessageEmbeds(embed.build()).complete()
         return true
     }
 }

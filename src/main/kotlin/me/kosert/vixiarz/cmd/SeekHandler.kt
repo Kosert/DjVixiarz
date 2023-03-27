@@ -6,6 +6,7 @@ import me.kosert.vixiarz.sendError
 import me.kosert.vixiarz.voiceController
 import me.sargunvohra.lib.ktunits.minutes
 import me.sargunvohra.lib.ktunits.seconds
+import net.dv8tion.jda.api.entities.MessageHistory
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 
 class SeekHandler : IHandler {

@@ -6,7 +6,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 object QueueHandler : IHandler {
 
     override suspend fun handle(event: MessageReceivedEvent): Boolean {
-        event.channel.sendMessage(event.voiceController().queue()).complete()
+        event.channel.sendMessageEmbeds(event.voiceController().queue()).complete()
         return true
     }
 }

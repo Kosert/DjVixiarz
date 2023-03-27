@@ -17,7 +17,7 @@ object RequireDjHandler : IHandler {
                 setTitle("Nie dla psa, dla pana to")
                 setDescription("Brak uprawnień")
             }
-            event.channel.sendMessage(embed)
+            event.channel.sendMessageEmbeds(embed)
             return true
         }
 

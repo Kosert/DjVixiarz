@@ -8,7 +8,7 @@ object JoinHandler : IHandler {
     override suspend fun handle(event: MessageReceivedEvent): Boolean {
         val channel = event.member?.voiceState?.channel ?: return false
         val guildId = channel.guild.id
-        GuildVoiceManager.getVoice(guildId).join(channel)
+        GuildVoiceManager.getVoice(guildId).join(channel.asVoiceChannel())
         return true
     }
 }

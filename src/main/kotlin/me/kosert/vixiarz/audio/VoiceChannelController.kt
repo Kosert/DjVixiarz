@@ -7,9 +7,12 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack
 import me.kosert.vixiarz.*
 import me.kosert.vixiarz.Const.ERROR_TITLE
 import me.kosert.vixiarz.audio.PlayerManager.PLAYER_MANAGER
+import me.kosert.vixiarz.webpanel.model.ChannelDetails
+import me.kosert.vixiarz.webpanel.model.ChannelInfo
+import me.kosert.vixiarz.webpanel.model.MediaItem
 import net.dv8tion.jda.api.entities.Member
 import net.dv8tion.jda.api.entities.MessageEmbed
-import net.dv8tion.jda.api.entities.VoiceChannel
+import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel
 import java.awt.Color
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
@@ -143,7 +146,6 @@ class VoiceChannelController {
         }
     }
 
-
     fun setPause(pause: Boolean): MessageEmbed? {
         if (player.isPaused == pause) {
             return null
@@ -239,7 +241,7 @@ class VoiceChannelController {
 
         if (player.isPaused) {
             setDescription("Muzyka spauzowana - wpisz !resume żeby wznowić")
-        } else if (scheduler.getQueue().isNotEmpty()){
+        } else if (scheduler.getQueue().isNotEmpty()) {
             setDescription("W kolejce jest ${scheduler.getQueue().size} piosenek")
         }
 
@@ -261,5 +263,41 @@ class VoiceChannelController {
         val currentLeft = player.playingTrack.duration - player.playingTrack.position
         val total = currentLeft + length
         addField("Pozostała długość:", total.formatAsDuration(asText = true), false)
+    }
+
+    fun getConnectedChannelInfo(): ChannelInfo? = currentChannel?.let {
+        ChannelInfo(it.id, it.name, it.guild.name, it.guild.id)
+    }
+
+    fun getConnectedChannelDetails(): ChannelDetails? = currentChannel?.let { channel ->
+        val nowPlaying = currentSong?.let {
+            MediaItem.NowPlaying(
+                it.info.title,
+                it.info.author,
+                it.songInfo.adder,
+                it.songInfo.adderAvatarUrl,
+                if (it.info.isStream) -1 else it.duration,
+                it.info.uri,
+                it.position
+            )
+        }
+        val queue = scheduler.getQueue().map {
+            MediaItem.QueuedItem(
+                it.info.title,
+                it.info.author,
+                it.songInfo.adder,
+                it.songInfo.adderAvatarUrl,
+                if (it.info.isStream) -1 else it.duration,
+                it.info.uri
+            )
+        }
+
+        ChannelDetails(
+            channel.name,
+            channel.guild.id,
+            channel.guild.name,
+            channel.guild.iconUrl,
+            queue.prepend(nowPlaying).filterNotNull()
+        )
     }
 }

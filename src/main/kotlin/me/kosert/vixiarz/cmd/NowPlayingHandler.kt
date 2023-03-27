@@ -6,7 +6,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 object NowPlayingHandler : IHandler {
 
     override suspend fun handle(event: MessageReceivedEvent): Boolean {
-        event.channel.sendMessage(event.voiceController().nowPlaying()).complete()
+        event.channel.sendMessageEmbeds(event.voiceController().nowPlaying()).complete()
         return true
     }
 

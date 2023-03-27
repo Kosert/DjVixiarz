@@ -1,17 +1,10 @@
 package me.kosert.vixiarz.cmd
 
 import kotlinx.coroutines.*
-import me.kosert.vixiarz.Const
-import me.kosert.vixiarz.Const.ERROR_TITLE
-import me.kosert.vixiarz.createEmbed
 import me.kosert.vixiarz.searcher.MusicSearcher
 import me.kosert.vixiarz.sendError
 import me.kosert.vixiarz.voiceController
-import net.dv8tion.jda.api.entities.MessageChannel
-import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
-import java.awt.Color
-import kotlin.coroutines.coroutineContext
 
 object PlayHandler : IHandler {
 
@@ -51,7 +44,7 @@ object PlayHandler : IHandler {
 
         val adder = event.member ?: return@coroutineScope true
         val embedResult = event.voiceController().play(adder, url, event.message.channel.id)
-        event.channel.sendMessage(embedResult).complete()
+        event.channel.sendMessageEmbeds(embedResult).complete()
         return@coroutineScope true
     }
 }
