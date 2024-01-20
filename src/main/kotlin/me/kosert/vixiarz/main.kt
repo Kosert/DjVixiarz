@@ -8,6 +8,7 @@ import me.kosert.vixiarz.Const.START_TAG
 import me.kosert.vixiarz.audio.GuildVoiceManager
 import me.kosert.vixiarz.auth.Secrets
 import me.kosert.vixiarz.cmd.Command
+import me.kosert.vixiarz.webpanel.runServer
 import net.dv8tion.jda.api.JDABuilder
 import net.dv8tion.jda.api.events.guild.voice.GenericGuildVoiceEvent
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent

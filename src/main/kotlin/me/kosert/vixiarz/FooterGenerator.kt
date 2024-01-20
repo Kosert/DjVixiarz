@@ -22,7 +22,15 @@ object FooterGenerator {
         "Robson = Radek",
         "Zaczarowany burdel O O O",
         "Sejfy.pl - jesteśmy bezpieczni",
-        "XES - od tyłu też jest fajnie"
+        "XES - od tyłu też jest fajnie",
+        "Jacek, Ty jebany betoniarzu",
+        "On mnie rucha, a ja jestem sucha",
+        "Możesz odpalić fotki i iść se zwalić konia",
+        "Pamiętasz jeszcze mordo co wysyłałeś wczoraj?",
+        "Dlaczego Mati Murański nie może zjeść hamburgera?",
+        "Ja jestem Fagata, sexy cipka spod Konina",
+        "W kiepskim świecie kiepskie sprawy",
+
     )
 
     fun generate(): String = footers.random() + " ( ͡° ͜ʖ ͡°)"

@@ -11,6 +11,7 @@ import me.kosert.vixiarz.models.Presence
 import me.kosert.vixiarz.send
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 
+@Deprecated("RIP Kotożercy")
 object ScheduleHandler : IHandler {
     private const val FILE_URL = "https://www.googleapis.com/drive/v3/files/1YWNRFLHVzL60A9HolsYutR3Cz_63wMv82HzEm2-LDbE/export"
 

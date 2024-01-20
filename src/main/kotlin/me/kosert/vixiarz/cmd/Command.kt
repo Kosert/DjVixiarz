@@ -32,13 +32,17 @@ enum class Command(
 
     CLEAR(listOf("clear"), RequireDjHandler, ClearHandler(), help = "Czyści kłełe"),
 
-    SCHEDULE(listOf("ktogra"), ScheduleHandler, help = "Pokazuje harmonogram kotożerców"),
+//    SCHEDULE(listOf("ktogra"), ScheduleHandler, help = "Pokazuje harmonogram kotożerców"),
+    RANDOM_KIEPSCY(listOf("losujodcinek", "losujkiepskich"), KiepscyHandler, help = "Podaje losowy odcinek Świata wg Kiepskich"),
 
-    // LYRICS(listOf("lyrics"), LyricsHandler, help = "Pokazuje tekst piosenki"),
+//    LYRICS(listOf("lyrics"), LyricsHandler, help = "Pokazuje tekst piosenki"),
 
     URBAN_JUNGLE(listOf("miejskadżungla", "miejskadzungla", "dzungla"), JungleHandler),
     POPE(listOf("rarepope", "pope", "jp2"), PopeHandler),
     PUSHER(listOf("pusher", "babahassan"), PusherHandler),
     METRONOME(listOf("piotras", "metronome", "tiktok"), MetronomeHandler),
+
+//    STAT(listOf("statsdump"), StatisticsCounter()),
+    ALIAS(listOf("alias"), )
 
 }
